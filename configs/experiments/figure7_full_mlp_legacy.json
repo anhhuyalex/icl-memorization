@@ -1,0 +1,32 @@
+{
+  "name": "memo_jan24_zipf_onelayerattention_vary_num_hidden_features_num_heads_noresample",
+  "entrypoint": "main.py",
+  "source_cache": "memo_jan24_zipf_onelayerattention_vary_num_hidden_features_num_heads_noresample",
+  "used_by": ["Figure 7"],
+  "note": "The retained full-MLP architecture points were recovered from the Figure 7 cache because the original Jan. 24 selector is not present in the current main.py.",
+  "environment": {"WANDB_MODE": "offline"},
+  "arguments": {
+    "wandb_log": false, "wandb_project": "l2l",
+    "wandb_group_name": "memo_jan24_zipf_onelayerattention_vary_num_hidden_features_num_heads_noresample",
+    "fileprefix": "transformer", "batch-size": 256, "optimizer": "Adam",
+    "lr": 0.001, "wd": 0.0, "arch": "OneLayerAttention", "vocab_size": 2,
+    "num_layers": 1, "num_mlp_layers": 3, "len_context": 100,
+    "K": 100000, "num_iters": 80000, "num_iters_per_epoch": 1000,
+    "sequence_sampling_distribution": "zipf", "is_resample_tasks": "False"
+  },
+  "sweep": {
+    "runs": [
+      {"num_heads": 9, "num_hidden_features": 1, "num_hidden_features_mlp": 9},
+      {"num_heads": 2, "num_hidden_features": 8, "num_hidden_features_mlp": 16},
+      {"num_heads": 16, "num_hidden_features": 1, "num_hidden_features_mlp": 16},
+      {"num_heads": 1, "num_hidden_features": 64, "num_hidden_features_mlp": 64},
+      {"num_heads": 2, "num_hidden_features": 64, "num_hidden_features_mlp": 128},
+      {"num_heads": 16, "num_hidden_features": 8, "num_hidden_features_mlp": 128},
+      {"num_heads": 9, "num_hidden_features": 64, "num_hidden_features_mlp": 576},
+      {"num_heads": 2, "num_hidden_features": 512, "num_hidden_features_mlp": 1024},
+      {"num_heads": 16, "num_hidden_features": 64, "num_hidden_features_mlp": 1024},
+      {"num_heads": 9, "num_hidden_features": 512, "num_hidden_features_mlp": 4608}
+    ],
+    "array_indexing": "one explicit retained full-MLP architecture per index"
+  }
+}

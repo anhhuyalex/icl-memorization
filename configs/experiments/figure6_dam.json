@@ -1,0 +1,21 @@
+{
+  "name": "memo_dam_apr10_K_100_is_freeze_A_LearnAB",
+  "entrypoint": "main_dam.py",
+  "source_cache": "memo_dam_apr10_K_100_is_freeze_A_LearnAB",
+  "used_by": ["Figure 6b"],
+  "arguments": {
+    "savedir": "./results", "prefix": "memo_dam_apr10_K_100_is_freeze_A_LearnAB",
+    "eta": 10.0, "N": 50, "M": 3000, "K": 500, "BATCH_SIZE": 50,
+    "NUM_STEPS": 10000, "NUM_ITERS_PER_LOG": 100, "is_freeze_A": "LearnAB"
+  },
+  "sweep": {
+    "runs": [
+      {"H": 1, "lr": 0.01, "INIT_STD": 0.01},
+      {"H": 5, "lr": 0.01, "INIT_STD": 0.1},
+      {"H": 10, "lr": 0.01, "INIT_STD": 0.01},
+      {"H": 30, "lr": 0.01, "INIT_STD": 0.01},
+      {"H": 100, "lr": 0.01, "INIT_STD": 0.1}
+    ],
+    "array_indexing": "one explicit run per hidden size H"
+  }
+}

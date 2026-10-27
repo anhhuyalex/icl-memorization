@@ -1,0 +1,20 @@
+{
+  "name": "memo_apr3_zipf_onelayerattention_lr_1e-3_swapmlp_eval",
+  "entrypoint": "main_freeze.py",
+  "source_cache": "memo_apr3_zipf_onelayerattention_lr_1e-3_swapmlp_eval",
+  "used_by": ["Figure 4 heatmaps"],
+  "environment": {"WANDB_MODE": "offline"},
+  "arguments": {
+    "wandb_log": false, "wandb_project": "l2l",
+    "wandb_group_name": "memo_apr3_zipf_onelayerattention_lr_1e-3_swapmlp_eval",
+    "fileprefix": "transformer", "batch-size": 256, "optimizer": "Adam",
+    "lr": 0.001, "wd": 0.0, "arch": "OneLayerAttention",
+    "num_layers": 1, "num_mlp_layers": 3,
+    "len_context": 100, "K": 100000, "num_iters": 100000,
+    "sequence_sampling_distribution": "zipf", "is_resample_tasks": "True"
+  },
+  "sweep": {
+    "axes": [{"argument": "SLURM_ARRAY_TASK_ID", "range": {"start": 0, "stop": 60}}],
+    "array_indexing": "main_freeze.py varies head count and per-head width."
+  }
+}

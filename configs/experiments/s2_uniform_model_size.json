@@ -1,0 +1,20 @@
+{
+  "name": "memo_jan14_uniformdist_modelsize",
+  "entrypoint": "main.py",
+  "source_cache": "memo_jan14_uniformdist_modelsize",
+  "used_by": ["Figure S2"],
+  "environment": {"WANDB_MODE": "offline"},
+  "arguments": {
+    "wandb_log": false, "wandb_project": "l2l",
+    "wandb_group_name": "memo_jan14_uniformdist_modelsize",
+    "fileprefix": "transformer", "batch-size": 256, "optimizer": "Adam",
+    "lr": 0.001, "wd": 0.0, "arch": "gpt", "gpt_bias": "True",
+    "num_layers": 12, "num_mlp_layers": 3, "len_context": 100,
+    "K": 10000, "num_iters": 100000, "num_iters_per_epoch": 1000,
+    "sequence_sampling_distribution": "uniform", "is_resample_tasks": "False"
+  },
+  "sweep": {
+    "axes": [{"argument": "SLURM_ARRAY_TASK_ID", "range": {"start": 0, "stop": 144}}],
+    "array_indexing": "main.py selects H=1,...,12 and F=2,4,...,4096, with H varying fastest."
+  }
+}

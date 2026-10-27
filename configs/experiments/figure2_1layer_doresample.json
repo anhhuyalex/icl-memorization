@@ -1,0 +1,20 @@
+{
+  "name": "memo_jan20_zipf_onelayerattention_vary_num_hidden_features_num_heads_doresample",
+  "entrypoint": "main.py",
+  "source_cache": "memo_jan20_zipf_onelayerattention_vary_num_hidden_features_num_heads_doresample",
+  "used_by": ["Figure 2c (bottom)", "Figure 3c,d", "Figure S4 (right)", "Figure S6", "Figure 5", "Figure S9", "Figure S10"],
+  "environment": {"WANDB_MODE": "offline"},
+  "arguments": {
+    "wandb_log": false, "wandb_project": "l2l",
+    "wandb_group_name": "memo_jan20_zipf_onelayerattention_vary_num_hidden_features_num_heads_doresample",
+    "fileprefix": "transformer", "batch-size": 256, "optimizer": "Adam",
+    "lr": 0.001, "wd": 0.0, "arch": "OneLayerAttention", "gpt_bias": "True",
+    "vocab_size": 2, "num_layers": 1, "num_mlp_layers": 3, "len_context": 100,
+    "K": 100000, "num_iters": 80000, "num_iters_per_epoch": 1000,
+    "sequence_sampling_distribution": "zipf", "is_resample_tasks": "True"
+  },
+  "sweep": {
+    "axes": [{"argument": "SLURM_ARRAY_TASK_ID", "range": {"start": 0, "stop": 90}}],
+    "array_indexing": "main.py selects H=[1,2,4,...,16] and F=[1,2,4,...,512], with H varying fastest; MLP width defaults to FH."
+  }
+}

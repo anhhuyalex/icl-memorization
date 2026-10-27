@@ -1,0 +1,22 @@
+{
+  "name": "memo_jan4_fork_progress_set_zero_all_attn_allow_learning_K_100000",
+  "entrypoint": "main_fork.py",
+  "source_cache": "memo_jan4_fork_progress_set_zero_all_attn_allow_learning_K_100000",
+  "used_by": ["Figure S8"],
+  "environment": {"WANDB_MODE": "offline"},
+  "arguments": {
+    "wandb_log": false, "wandb_project": "l2l",
+    "wandb_group_name": "memo_jan4_fork_progress_set_zero_all_attn_allow_learning_K_100000",
+    "fileprefix": "transformer", "batch-size": 256, "optimizer": "Adam",
+    "lr": 0.001, "wd": 0.0, "arch": "OneLayerAttention",
+    "vocab_size": 2, "num_layers": 1, "num_mlp_layers": 3, "len_context": 100,
+    "K": 100000, "num_iters": 40000, "num_iters_per_epoch": 400,
+    "sequence_sampling_distribution": "zipf", "is_resample_tasks": "False",
+    "is_initialize_attention_weights_to_zero": "zero_all_attn_allow_learning",
+    "train_seed": 42, "probe_seed": 43, "is_probe": "True", "probe_every_iter": 1
+  },
+  "sweep": {
+    "axes": [{"argument": "SLURM_ARRAY_TASK_ID", "range": {"start": 0, "stop": 20}}],
+    "array_indexing": "main_fork.py selects H=[1,2,10,18] and F=[1,4,22,107,512], with F varying fastest."
+  }
+}

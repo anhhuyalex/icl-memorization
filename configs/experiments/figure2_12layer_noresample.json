@@ -1,0 +1,20 @@
+{
+  "name": "memo_apr19_zipf_gpt2_vary_num_hidden_features_num_heads_noresample",
+  "entrypoint": "main.py",
+  "source_cache": "memo_apr19_zipf_gpt2_vary_num_hidden_features_num_heads_noresample",
+  "used_by": ["Figure 2a,b (top)", "Figure 3a", "Figure S1 (left)", "Figure S3", "Figure S4 (left)"],
+  "environment": {"WANDB_MODE": "offline"},
+  "arguments": {
+    "wandb_log": false, "wandb_project": "l2l",
+    "wandb_group_name": "memo_apr19_zipf_gpt2_vary_num_hidden_features_num_heads_noresample",
+    "fileprefix": "transformer", "batch-size": 256, "optimizer": "Adam",
+    "lr": 0.001, "wd": 0.0, "arch": "gpt", "gpt_bias": "True",
+    "num_layers": 12, "num_mlp_layers": 3, "len_context": 100,
+    "K": 100000, "num_iters": 200000, "num_iters_per_epoch": 1000,
+    "sequence_sampling_distribution": "zipf", "is_resample_tasks": "False"
+  },
+  "sweep": {
+    "axes": [{"argument": "SLURM_ARRAY_TASK_ID", "range": {"start": 0, "stop": 104}}],
+    "array_indexing": "main.py selects H=[2,...,14] and F=[2,4,...,256], with H varying fastest; runs outside 3e5 <= P <= 1e6 exit before training."
+  }
+}
