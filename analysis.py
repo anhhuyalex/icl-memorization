@@ -3739,7 +3739,7 @@ FIGURE6_DAM_RECORD_GLOB = (
 )
 FIGURE6_INFONCE_RECORD_GLOB = (
     f"{RESULTS_DIR}/"
-    "infonce_jan21_is_freeze_A_LearnAB/*.pt"
+    "infonce_jan21_is_freeze_A_BothAB/*.pt"
 )
 FIGURE6_SWITCH_STEP = 10_000
 FIGURE6_REFERENCE_PDF = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Figure6.pdf")
@@ -3754,8 +3754,9 @@ def load_figure6_accuracy_records(record_glob):
     """Load DAM-style records into the accuracy table used in Figure 6.
 
     The records contain one logging entry per natural training step.  Their
-    second phase restarts ``step`` at zero, so ``natural_step`` is retained for
-    the broken axis and ``step`` is shifted solely for provenance/debugging.
+    second phase restarts ``step`` at zero, so ``natural_step`` shifts it by the
+    phase length (0-based: 0..NUM_STEPS-1 before, NUM_STEPS..2*NUM_STEPS-1
+    after) for the broken axis.  ``phase`` separates the two sides of the switch.
     """
     paths = sorted(glob.glob(record_glob))
     if not paths:
@@ -3767,13 +3768,14 @@ def load_figure6_accuracy_records(record_glob):
         args = record["args"]
         hidden_size = getattr(args, "H")
         num_steps = getattr(args, "NUM_STEPS", FIGURE6_SWITCH_STEP)
-        for natural_step, log in enumerate(record["logs"], start=1):
+        for log in record["logs"]:
             phase = "before" if log["phase"] == "train" else "after"
             phase_offset = 0 if phase == "before" else num_steps
+            step = _figure6_scalar(log["step"]) + phase_offset
             rows.append({
                 "record_path": path,
-                "step": _figure6_scalar(log["step"]) + phase_offset,
-                "natural_step": natural_step,
+                "step": step,
+                "natural_step": step,
                 "loss": _figure6_scalar(log["loss"]),
                 "accuracy": _figure6_scalar(log["accuracy"]),
                 "phase": phase,
@@ -3791,22 +3793,27 @@ def load_figure6_accuracy_records(record_glob):
     return frame
 
 
-def _smooth_figure6_phase(frame, switch_step, epoch_bin, rolling_window):
-    """Bin and causally smooth one side of Figure 6's data switch."""
+def _smooth_figure6_phase(frame, window):
+    """Trailing (causal) running average of one side of Figure 6's data switch.
+
+    The value at step ``t`` is the mean of the raw accuracies at steps
+    ``t - window + 1 .. t``.  Only rows from this phase are passed in, so a
+    window never spans the switch, and ``min_periods=window`` means the first
+    point is a full-window average rather than a partial one.  If several
+    records share this ``H`` they are averaged per step first, so the window
+    always covers ``window`` distinct steps rather than ``window`` rows.
+    """
     if frame.empty:
         return pd.DataFrame(columns=["natural_step", "accuracy"])
 
-    smoothed = frame.copy()
-    smoothed["epoch_bin"] = (smoothed["natural_step"] // epoch_bin).astype(int)
     smoothed = (
-        smoothed.groupby("epoch_bin", as_index=False)
-        .agg(natural_step=("natural_step", "mean"), accuracy=("accuracy", "mean"))
+        frame.groupby("natural_step", as_index=False)["accuracy"].mean()
         .sort_values("natural_step")
     )
     smoothed["accuracy"] = (
-        smoothed["accuracy"].rolling(window=rolling_window, min_periods=1).mean()
+        smoothed["accuracy"].rolling(window=window, min_periods=window).mean()
     )
-    return smoothed
+    return smoothed.dropna(subset=["accuracy"])
 
 
 def _plot_figure6_broken_accuracy_panel(
@@ -3815,8 +3822,7 @@ def _plot_figure6_broken_accuracy_panel(
     frame,
     y_limits,
     switch_step=FIGURE6_SWITCH_STEP,
-    epoch_bin=100,
-    rolling_window=5,
+    window=100,
 ):
     """Draw one DAM/InfoNCE accuracy panel with a discontinuity at the switch."""
     panel_grid = grid_spec.subgridspec(
@@ -3840,14 +3846,20 @@ def _plot_figure6_broken_accuracy_panel(
 
     for hidden_size in h_values:
         subset = frame[frame["H"] == hidden_size].sort_values("natural_step")
-        pre_switch = subset[subset["natural_step"] < switch_step]
-        post_switch = subset[subset["natural_step"] >= switch_step]
-        pre_smooth = _smooth_figure6_phase(
-            pre_switch, switch_step, epoch_bin, rolling_window
-        )
-        post_smooth = _smooth_figure6_phase(
-            post_switch, switch_step, epoch_bin, rolling_window
-        )
+        # Split by phase before smoothing so no window mixes pre- and
+        # post-switch steps.
+        pre_switch = subset[subset["phase"] == "before"]
+        post_switch = subset[subset["phase"] == "after"]
+        pre_smooth = _smooth_figure6_phase(pre_switch, window)
+        post_smooth = _smooth_figure6_phase(post_switch, window)
+        if not pre_smooth.empty:
+            assert pre_smooth["natural_step"].max() < switch_step, (
+                "a pre-switch point lies at or after the switch"
+            )
+        if not post_smooth.empty:
+            assert post_smooth["natural_step"].min() >= switch_step + window - 1, (
+                "a post-switch point averages steps from before the switch"
+            )
         color = cmap(norm(hidden_size))
 
         left_plot = pre_smooth[
